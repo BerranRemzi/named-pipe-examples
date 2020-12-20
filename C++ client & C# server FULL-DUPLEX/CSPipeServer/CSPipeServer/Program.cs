@@ -67,10 +67,11 @@ using System.Threading;
 class Program
 {
     const int BUFFER_SIZE = 4096;  // 4 KB
-    
+
 
     static void listenToSNMP()
-    {   bool bResult;
+    {
+        bool bResult;
         /////////////////////////////////////////////////////////////////////
         // Create a named pipe.
         // 
@@ -141,28 +142,29 @@ class Program
         }
         // A byte buffer of BUFFER_SIZE bytes. The buffer should be big 
         // enough for ONE request from a client.
-  
-        while (true){
-        string strMessage;
-        byte[] bRequest = new byte[BUFFER_SIZE];    // Client -> Server
-        uint cbBytesRead, cbRequestBytes;
-        // Receive one message from the pipe.
-        cbRequestBytes = BUFFER_SIZE;
-        bResult = PipeNative.ReadFile(      // Read from the pipe.
-            hPipe,                          // Handle of the pipe
-            bRequest,                       // Buffer to receive data
-            cbRequestBytes,                 // Size of buffer in bytes
-            out cbBytesRead,                // Number of bytes read
-            IntPtr.Zero);                   // Not overlapped I/O
 
-        if (!bResult/*Failed*/ || cbBytesRead == 0/*Finished*/)
-            Console.WriteLine("Read Failed or Finished!");
+        while (true)
+        {
+            string strMessage;
+            byte[] bRequest = new byte[BUFFER_SIZE];    // Client -> Server
+            uint cbBytesRead, cbRequestBytes;
+            // Receive one message from the pipe.
+            cbRequestBytes = BUFFER_SIZE;
+            bResult = PipeNative.ReadFile(      // Read from the pipe.
+                hPipe,                          // Handle of the pipe
+                bRequest,                       // Buffer to receive data
+                cbRequestBytes,                 // Size of buffer in bytes
+                out cbBytesRead,                // Number of bytes read
+                IntPtr.Zero);                   // Not overlapped I/O
 
-        // Unicode-encode the byte array and trim all the '\0' chars at 
-        // the end.
-        strMessage = Encoding.Unicode.GetString(bRequest).TrimEnd('\0');
-        Console.WriteLine("Receives {0} bytes; Message: \"{1}\"",
-            cbBytesRead, strMessage);
+            if (!bResult/*Failed*/ || cbBytesRead == 0/*Finished*/)
+                Console.WriteLine("Read Failed or Finished!");
+
+            // Unicode-encode the byte array and trim all the '\0' chars at 
+            // the end.
+            strMessage = Encoding.Unicode.GetString(bRequest).TrimEnd('\0');
+            Console.WriteLine("Receives {0} bytes; Message: \"{1}\"",
+                cbBytesRead, strMessage);
         }
 
         PipeNative.FlushFileBuffers(hPipe);
@@ -300,7 +302,7 @@ class Program
                 cbBytesWritten, wrMessage.TrimEnd('\0'));
             Thread.Sleep(4000);
         }
-        
+
         /////////////////////////////////////////////////////////////////////
         // Flush the pipe to allow the client to read the pipe's contents 
         // before disconnecting. Then disconnect the pipe, and close the 
@@ -341,7 +343,7 @@ class Program
 
         producer.Join();   // Join both threads with no timeout
         consumer.Join();   // Run both until done.
-                
+
     }
 
     /*
